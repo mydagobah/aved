@@ -1,19 +1,51 @@
 #! /usr/local/bin python
-import os, sys, cv, time, random, threading, matplotlib
+import config
+import cv, time
+from threading import Thread
 from SimpleCV import *
 from Tkinter import *
-from scipy import misc, average, signal, mean
-from scipy.linalg import norm
-from numpy import arange, sin, pi
-from PIL import Image
+from scipy import signal, mean
 import numpy as np
 
-class Eye(threading.Thread):
+'''
+The central processing unit
+All decision making should be made here
+'''
+class Brain(Thread):
+    def __init__(self, face, eye1, eye2):
+        self.face = face
+        self.eye1 = eye1
+        self.eye2 = eye2
+
+    def run(self):
+        time.sleep(3) # wait for camera to load
+        self.observe()
+
+    def observe(self):
+        while (self.is_up()):
+            if (self.is_danger(self.eye1) or self.is_danger(self.eye2)):
+                self.face.displayDanger()
+            else:
+                self.face.displaySafe()
+            time.sleep(config.interval)
+
+    def is_danger(self, monitor):
+        danger = False
+        danger |= monitor.getRatio() > 0.4
+        danger |= monitor.getRatio() > 0.1 and monitor.getSpeed() > 0.8
+        return danger
+
+    def is_up(self):
+        return self.eye1.isAlive() and self.eye2.isAlive and config.status == 'on'
+
+'''
+Robot Eye
+'''
+class Eye(Thread):
     def __init__(self):
-        threading.Thread.__init__(self)
+        Thread.__init__(self)
         self.threshold = 30;
         self.filter = 5;
-        self.interval = 0.05;
         self.height = 96;
         self.width = 128;
         self.area = self.height * self.width; # screen size
@@ -27,12 +59,11 @@ class Eye(threading.Thread):
         self.ffg = np.zeros(shape = (self.height, self.width))
 
     def run(self):
-        global on
-        while on:
+        while config.status == 'on':
             f = self.cam.getImage()
             ff = self.calculate(f)
             app.drawLeye(ff)
-            time.sleep(self.interval)
+            time.sleep(config.interval)
 
     # function to gray scale
     def toGray(self, arr):
