@@ -1,10 +1,11 @@
 #! /usr/local/bin python
 import config
-import cv, matplotlib, ImageTk
-from SimpleCV import *
+import cv, matplotlib
+#from SimpleCV import *
 from Tkinter import *
 from PIL import Image
-import numpy as np
+from PIL import ImageTk
+import numpy
 import wx
 from matplotlib.figure import Figure
 import matplotlib.font_manager as font_manager
@@ -46,10 +47,10 @@ class Dashboard:
         leye.create_oval(50, 60, 350, 240, fill='black')
         reye.create_oval(50, 60, 350, 240, fill='black')
         # initial eyes
-        self.imgTk1 = ImageTk.PhotoImage(Image.fromarray(np.zeros([96,128])))
+        self.imgTk1 = ImageTk.PhotoImage(Image.fromarray(numpy.zeros([96,128])))
         self.leye_id = leye.create_image(135, 103, anchor=NW, image=self.imgTk1)
         self.leye = leye
-        self.imgTk2 = ImageTk.PhotoImage(Image.fromarray(np.zeros([96,128])))
+        self.imgTk2 = ImageTk.PhotoImage(Image.fromarray(numpy.zeros([96,128])))
         self.reye_id = reye.create_image(135, 103, anchor=NW, image=self.imgTk2)
         self.reye = reye
 
@@ -63,10 +64,11 @@ class Dashboard:
         dispFr.place(x=415, y=350)
         disp = Canvas(dispFr, width=404, height=304, bg='white')
         disp.place(x=-3, y=-3)
+
         # initial expression
-        self.safe = PhotoImage(file='safe.gif')
-        self.threat = PhotoImage(file='threat.gif')
-        self.sleep = PhotoImage(file='sleep.gif')
+        self.safe = PhotoImage(file='assets/safe.gif')
+        self.threat = PhotoImage(file='assets/threat.gif')
+        self.sleep = PhotoImage(file='assets/sleep.gif')
         fid = disp.create_image(80, 20, anchor=NW, image=self.sleep)
 
         # attributes
@@ -78,15 +80,14 @@ class Dashboard:
         root.update()
 
     def start(self):
-        global on
-        if (on):
-            on = False
-            self.btn.configure(text='Start')
-            self.face.itemconfigure(self.fid, image=self.sleep)
+        if (config.status == 'on'):
+            config.status = 'off'
+            self.btn.configure(text = 'Start')
+            self.face.itemconfigure(self.fid, image = self.sleep)
             t.Stop()
         else:
-            on = True
-            self.btn.configure(text='Stop')
+            config.status = 'on'
+            self.btn.configure(text = 'Stop')
             t1.start()
             t2.start()
             t3.start()
@@ -94,7 +95,7 @@ class Dashboard:
             frame.Show()
 
     def drawLeye(self, data):
-        np.transpose(data)
+        nump.transpose(data)
         self.imgTk1 = ImageTk.PhotoImage(Image.fromarray(data))
         self.leye.itemconfigure(self.leye_id, image=self.imgTk1)
 
@@ -107,7 +108,7 @@ class Dashboard:
         window.destroy()
 
     def displayDanger(self):
-        self.face.itemconfig(self.fid, image=app.threat)
+        self.face.itemconfig(self.fid, image = self.threat)
 
     def displaySafe(self):
-        self.face.itemconfig(self.fid, image=app.safe)
+        self.face.itemconfig(self.fid, image = self.safe)
