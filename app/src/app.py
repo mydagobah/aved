@@ -1,8 +1,9 @@
 #! /usr/local/bin python
 from Tkinter import Tk
 import wx
-from dashboard import Dashboard
+import yaml
 import config
+from dashboard import Dashboard
 
 class App:
     def __init__(self):

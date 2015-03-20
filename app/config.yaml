@@ -1,0 +1,18 @@
+---
+
+title: Animated Vision and Event Detection Simulation
+size:
+    width: 825
+    height: 690
+background: black
+foreground: '#f2f9fc'
+font:
+    type: Comic Sans MS
+    size: 24
+
+robot:
+    interval: 0.05
+    threshold:
+        distance: 0.4
+        speed: 0.8
+
